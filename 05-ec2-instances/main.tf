@@ -15,10 +15,12 @@ terraform {
 provider "aws" {
   region = "us-east-1"
 }
-
+resource "aws_default_vpc" "default" {
+  
+}
 resource "aws_security_group" "http_server_sg" {
   name   = "http_server_sg"
-  vpc_id = "vpc-0b4a1af6285902a84"
+  vpc_id = aws_default_vpc.default.id
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 80
