@@ -18,6 +18,14 @@ provider "aws" {
 resource "aws_default_vpc" "default" {
   
 }
+
+data "aws_subnets" "default_subnets" {
+  filter {
+    name = "vpc-id"
+    values = [aws_default_vpc.default.id]
+  }
+  
+}
 resource "aws_security_group" "http_server_sg" {
   name   = "http_server_sg"
   vpc_id = aws_default_vpc.default.id
@@ -50,7 +58,7 @@ resource "aws_instance" "http_server" {
   key_name               = "myVirginiaKey"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.http_server_sg.id]
-  subnet_id              = "subnet-0376f634782e7d338"
+  subnet_id              = data.aws_subnets.default_subnets.ids[0]
 
   connection {
     type        = "ssh"
