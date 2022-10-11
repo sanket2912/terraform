@@ -40,3 +40,10 @@ resource "aws_security_group" "http_server_sg" {
   }
 }
 
+resource "aws_instance" "http_server" {
+  ami = "ami-026b57f3c383c2eec"
+  key_name = "myVirginiaKey"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [ aws_security_group.http_server_sg.id]
+  subnet_id = "subnet-0376f634782e7d338"
+}
