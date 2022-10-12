@@ -16,15 +16,15 @@ provider "aws" {
   region = "us-east-1"
 }
 resource "aws_default_vpc" "default" {
-  
+
 }
 
 data "aws_subnets" "default_subnets" {
   filter {
-    name = "vpc-id"
+    name   = "vpc-id"
     values = [aws_default_vpc.default.id]
   }
-  
+
 }
 resource "aws_security_group" "http_server_sg" {
   name   = "http_server_sg"
@@ -52,9 +52,27 @@ resource "aws_security_group" "http_server_sg" {
     "name" = "http_server_sg"
   }
 }
+data "aws_ami" "aws-linux-2-leatest" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-kernel-5.10-hvm*"]
+  }
 
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+}
+
+data "aws_ami_ids" "aws-linux-2-leatest-ids" {
+  owners = ["amazon"]
+}
 resource "aws_instance" "http_server" {
-  ami                    = "ami-026b57f3c383c2eec"
+  #ami                    = "ami-026b57f3c383c2eec"
+  ami                    = data.aws_ami.aws-linux-2-leatest.id
   key_name               = "myVirginiaKey"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.http_server_sg.id]
