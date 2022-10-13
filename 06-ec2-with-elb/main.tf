@@ -44,6 +44,35 @@ resource "aws_security_group" "http_server_sg" {
   }
 }
 
+
+resource "aws_security_group" "elb_sg" {
+  name   = "elb_sg"
+  vpc_id = aws_default_vpc.default.id
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 80
+    protocol    = "tcp"
+    to_port     = 80
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+resource "aws_elb" "elb" {
+  name = "elb"
+  subnets = data.aws_subnets.default_subnets.ids
+  security_groups = [aws_security_group.elb_sg.id]
+  instances = values(aws_instance.http_server).*.id
+  listener {
+  instance_port = 80
+  instance_protocol = "http"
+  lb_port = 80
+  lb_protocol = "http"
+  }
+}
 resource "aws_instance" "http_server" {
   #ami                    = "ami-026b57f3c383c2eec"
   ami                    = data.aws_ami.aws-linux-2-leatest.id
